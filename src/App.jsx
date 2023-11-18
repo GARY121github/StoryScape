@@ -30,8 +30,9 @@ const App = () => {
     (
       <div className="">
         <Header />
-        <h1 className="text-2xl">Main Page</h1>
-        <Outlet />
+        <main>
+          <Outlet />
+        </main>
         <Footer />
       </div>
     )
