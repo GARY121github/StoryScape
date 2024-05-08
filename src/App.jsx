@@ -5,6 +5,8 @@ import authService from './appwrite/auth';
 import { login, logout } from './store/authSlice';
 import { Footer, Header } from './components';
 import { Outlet } from 'react-router-dom';
+import appwriteService from './appwrite/config';
+import {allPosts} from './store/postSlice';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -20,9 +22,20 @@ const App = () => {
           dispatch(logout());
         }
       })
+      .then(() => {
+        appwriteService.getPosts()
+          .then((posts) => {
+            if (posts) {
+              dispatch(allPosts(posts.documents));
+            }
+            else {
+              dispatch(allPosts([]));
+            }
+          });
+      })
       .finally(() => setLoading(false));
   }, []);
-
+  
   return loading ?
     (
       <h1>Loading...</h1>

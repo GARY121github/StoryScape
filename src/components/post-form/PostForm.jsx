@@ -4,6 +4,9 @@ import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Loader2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addPost, editPost } from "../../store/postSlice";
 
 export default function PostForm({ post }) {
     const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
@@ -15,11 +18,14 @@ export default function PostForm({ post }) {
         },
     });
 
+    const [submitting, setSubmitting] = React.useState(false);
+
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth.userData);
+    const dispatch = useDispatch();
 
     const submit = async (data) => {
-        console.log("FORM SUBMIT", data);
+        setSubmitting(true);
         if (post) {
             const file = data.image[0] ? await appwriteService.uploadFile(data.image[0]) : null;
 
@@ -33,6 +39,7 @@ export default function PostForm({ post }) {
             });
 
             if (dbPost) {
+                dispatch(editPost({...dbPost}))
                 navigate(`/post/${dbPost.$id}`);
             }
         } else {
@@ -43,11 +50,14 @@ export default function PostForm({ post }) {
                 data.featuredImage = fileId;
                 const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id });
 
+                console.log("" , dbPost);
                 if (dbPost) {
+                    dispatch(addPost({...dbPost}));
                     navigate(`/post/${dbPost.$id}`);
                 }
             }
         }
+        setSubmitting(false);
     };
 
     const slugTransform = useCallback((value) => {
@@ -115,12 +125,23 @@ export default function PostForm({ post }) {
                     {...register("status", { required: true })}
                 />
                 <Button
-                    type="submit"
+                    type={submitting ? "disable" : "submit"}
                     bgColor={post ? "bg-green-500" : undefined}
-                    className="w-full"
+                    className="w-full flex justify-center items-center"
+
                     onClick={(e) => { "SUBMIT BUTTON CLICKED!!!" }}
                 >
-                    {post ? "Update" : "Submit"}
+                    {
+                        submitting ? (
+                            <>
+                            <Loader2 className="h-4 w-4 animate-spin" /> {post ? "Updating" : "Submitting"}
+                            </> 
+                        ) : (
+                            <>
+                            {post ? "Update" : "Submit"}
+                            </>
+                        )
+                    }
                 </Button>
             </div>
         </form>

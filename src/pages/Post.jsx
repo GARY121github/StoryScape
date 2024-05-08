@@ -3,33 +3,38 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import appwriteService from "../appwrite/config";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
-import { useSelector } from "react-redux";
+import { useSelector , useDispatch} from "react-redux";
+import { deletePost } from "../store/postSlice";
 
 export default function Post() {
     const [post, setPost] = useState(null);
     const { slug } = useParams();
     const navigate = useNavigate();
 
+    const dispatch = useDispatch();
+
+    const posts = useSelector((state) => state.posts.posts);
+
     const userData = useSelector((state) => state.auth.userData);
 
     const isAuthor = post && userData ? post.userId === userData.$id : false;
 
     useEffect(() => {
-        if (slug) {
-            appwriteService.getPost(slug).then((post) => {
-                if (post) setPost(post);
-                else navigate("/");
-            });
-        } else navigate("/");
+        const post = posts.find((post) => post.$id === slug);
+        if(!post){
+            navigate('/');
+        }
+        setPost(post);
     }, [slug, navigate]);
 
-    const deletePost = () => {
-        appwriteService.deletePost(post.$id).then((status) => {
-            if (status) {
-                appwriteService.deleteFile(post.featuredImage);
-                navigate("/");
-            }
-        });
+    const deletePost = async () => {
+        const status = await appwriteService.deletePost(post.$id);
+        console.log(status)
+        if (status) {
+            await appwriteService.deleteFile(post.featuredImage);
+            dispatch(deletePost(post.$id));
+            navigate("/");
+        }
     };
 
     return post ? (

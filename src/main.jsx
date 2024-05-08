@@ -15,7 +15,7 @@ import EditPost from "./pages/EditPost";
 
 import Post from "./pages/Post";
 
-import AllPosts from "./pages/AllPosts";
+import MyPosts from "./pages/MyPosts";
 
 const router = createBrowserRouter([
     {
@@ -47,10 +47,10 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/all-posts",
+                path: "/my-posts",
                 element: (
                     <AuthLayout authentication>
-                        <AllPosts />
+                        <MyPosts />
                     </AuthLayout>
                 ),
             },
