@@ -7,10 +7,12 @@ import { Footer, Header } from './components';
 import { Outlet } from 'react-router-dom';
 import appwriteService from './appwrite/config';
 import {allPosts} from './store/postSlice';
+import { useSelector } from 'react-redux';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector(state => state.auth.status);
 
   useEffect(() => {
     authService.getCurrentUser()
@@ -34,7 +36,7 @@ const App = () => {
           });
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [isLoggedIn]);
   
   return loading ?
     (
