@@ -8,6 +8,7 @@ import { Outlet } from 'react-router-dom';
 import appwriteService from './appwrite/config';
 import {allPosts} from './store/postSlice';
 import { useSelector } from 'react-redux';
+import { Loader2 } from 'lucide-react';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,9 @@ const App = () => {
   
   return loading ?
     (
-      <h1>Loading...</h1>
+      <div className='flex flex-col items-center justify-center h-screen'>
+        <Loader2 size={48} className='animate-spin'/>
+      </div>
     ) :
     (
       <div className="">
